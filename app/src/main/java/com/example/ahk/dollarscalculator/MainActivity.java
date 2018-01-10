@@ -78,7 +78,6 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
             }
         } else {
             buttonIncrease.setEnabled(true);
-            //just commen
         }
 
         calendar.add(Calendar.DAY_OF_YEAR, changeDay);

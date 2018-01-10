@@ -5,7 +5,6 @@
     <item
         android:id="@+id/menuitem_touch"
         android:title="touch"
-        android:enabled="false"
         android:showAsAction="ifRoom" />
     <item
         android:id="@+id/menuitem_alfa"
