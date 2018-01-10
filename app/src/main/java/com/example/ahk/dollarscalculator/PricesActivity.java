@@ -74,6 +74,7 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
             textViewHeader.setTextColor(0xFF0000FF);
         }
 
+        //just comment
         adapterAyyam = new PricesAdapter(this, ADAPTER_TYPE_AYYAM, ayyamPrices);
         adapterDollars = new PricesAdapter(this, ADAPTER_TYPE_DOLLARS, dollarsPrices);
 
