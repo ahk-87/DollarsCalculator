@@ -3,8 +3,12 @@ package com.example.ahk.dollarscalculator;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.text.format.DateUtils;
 import android.widget.TextView;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -14,13 +18,13 @@ import java.util.Locale;
 
 abstract class Cards {
 
-    public static final int CARD_TYPE_TOUCH = 1;
-    public static final int CARD_TYPE_ALFA = 2;
-    public static final int CARD_TYPE_ALFAGIFT = 3;
+    static final int CARD_TYPE_TOUCH = 1;
+    static final int CARD_TYPE_ALFA = 2;
+    static final int CARD_TYPE_ALFAGIFT = 3;
 
-    public static final String SHARED_PREF = "_shared";
-    public static final String SHARED_AYYAM = "ayyam_shared";
-    public static final String SHARED_DOLLARS = "dollars_shared";
+    static final String SHARED_PREF = "_shared";
+    static final String SHARED_AYYAM = "ayyam_shared";
+    static final String SHARED_DOLLARS = "dollars_shared";
 //    public static final String SHARED_ALFA_AYYAM = "ayyam_shared2";
 //    public static final String SHARED_ALFA_DOLLARS = "dollars_shared2";
 
@@ -140,11 +144,16 @@ class TouchCards extends Cards {
             lost = 0;
             while (data.moveToNext()) {
                 String row = data.getString(1);
+                Calendar sentDate = new GregorianCalendar();
+                sentDate.setTimeInMillis(data.getLong(2));
+                boolean afterTen = sentDate.get(Calendar.HOUR_OF_DAY) >= 22;
                 if (row.contains("from your")) {
                     String dollarsSentString = row.split(" ")[2].substring(1);
                     Integer dollarsSent = Integer.parseInt(dollarsSentString);
                     sentDollars += dollarsSent + 0.45;
                     TotalMoney += dollarsPrice[dollarsSent];
+                    if (afterTen)
+                        sentDollars -= 0.01;
                 } else if (row.contains("to your")) {
                     String[] words = row.split(" ");
                     String dollarsReceivedString = words[2].substring(1);
@@ -158,6 +167,7 @@ class TouchCards extends Cards {
                     receivedDollars += dollarsReceived;
                 } else {
                     sentDollars += 0.05;
+                    if (afterTen) sentDollars -= 0.01;
                     lost++;
                 }
             }
@@ -223,7 +233,7 @@ class AlfaCards extends Cards {
             while (data.moveToNext()) {
                 String row = data.getString(1);
                 if (row.contains("you have offered")) {
-                    String[] words =  row.split(" ");
+                    String[] words = row.split(" ");
                     if (words[7].length() < 9) continue;
                     String dollarsSentString = words[16].substring(0, 2);
                     int dollarsSent = Integer.parseInt(dollarsSentString);
