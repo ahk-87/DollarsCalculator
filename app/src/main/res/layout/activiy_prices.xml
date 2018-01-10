@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_MainHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:text="TextView"
+        android:textSize="30sp" />
+
+
+    <LinearLayout
+        android:id="@+id/linear_headers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_MainHeader"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_ayyamHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/darker_gray"
+            android:gravity="center"
+            android:text="Ayyam" />
+
+        <TextView
+            android:id="@+id/tv_dollarHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/darker_gray"
+            android:gravity="center"
+            android:text="Dollars" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/linear_lists"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/linear_250"
+        android:layout_below="@+id/linear_headers"
+        android:orientation="horizontal">
+
+        <ListView
+            android:id="@+id/list_ayyam"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:choiceMode="singleChoice" />
+
+        <ListView
+            android:id="@+id/list_dollars"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:choiceMode="singleChoice" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/linear_250"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_substract"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:onClick="changerPrice"
+            android:text="-"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="500"
+            android:textColor="@android:color/holo_green_dark"
+            android:textSize="30sp" />
+
+        <Button
+            android:id="@+id/button_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:onClick="changerPrice"
+            android:text="+"
+            android:textSize="30sp" />
+    </LinearLayout>
+
+</RelativeLayout>
