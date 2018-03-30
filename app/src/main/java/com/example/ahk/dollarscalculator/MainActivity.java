@@ -9,6 +9,7 @@ import android.provider.Telephony;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -17,6 +18,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -27,7 +30,6 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
 
     GregorianCalendar calendar, nextCalendar;
-    TextView tvDate, tvTotalMoney;
     ImageButton buttonDecrease, buttonIncrease;
     SimpleDateFormat dateFormatter;
 
@@ -36,20 +38,50 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
     Cards lastCard;
 
+    ArrayList<DollarsData> dollarsDataList;
+
+    CheckBox cummulative;
+    TextView tvDate, tvTotalMoney;
+    TextView tv_touchSentDollars, tv_touchReceivedDollars, tv_touchCardsCount;
+    TextView tv_alfaSentDollars, tv_alfaReceivedDollars, tv_alfaCardsCount;
+
+    int dayIndex = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
-        touch = new TouchCards(this);
-        alfa = new AlfaCards(this);
+        cummulative = (CheckBox) findViewById(R.id.cb_cumulative);
+
+        tv_touchSentDollars = (TextView) findViewById(R.id.tv_TouchSent);
+        tv_touchReceivedDollars = (TextView) findViewById(R.id.tv_TouchReceived);
+        tv_touchCardsCount = (TextView) findViewById(R.id.tv_TouchCards);
+
+        tv_alfaSentDollars = (TextView) findViewById(R.id.tv_AlfaSent);
+        tv_alfaReceivedDollars = (TextView) findViewById(R.id.tv_AlfaReceived);
+        tv_alfaCardsCount = (TextView) findViewById(R.id.tv_AlfaCards);
 
         tvDate = (TextView) findViewById(R.id.row_textDescription);
         tvTotalMoney = (TextView) findViewById(R.id.tv_TotalMoney);
+
         buttonDecrease = (ImageButton) findViewById(R.id.button_DecreaseDate);
         buttonIncrease = (ImageButton) findViewById(R.id.button_IncreaseDate);
         buttonIncrease.setEnabled(false);
+
+        dateFormatter = (SimpleDateFormat) DateFormat.getDateInstance();
+        dateFormatter.applyPattern("dd-MM-yyyy");
+
+        initiateData();
+    }
+
+    void initiateData() {
+        touch = new TouchCards(this);
+        alfa = new AlfaCards(this);
+
+        dayIndex = 0;
+        dollarsDataList = new ArrayList<>();
 
         calendar = new GregorianCalendar();
         calendar.set(Calendar.HOUR_OF_DAY, 3);
@@ -59,37 +91,38 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         nextCalendar = (GregorianCalendar) calendar.clone();
         nextCalendar.add(Calendar.DAY_OF_YEAR, 1);
 
-        dateFormatter = (SimpleDateFormat) DateFormat.getDateInstance();
-        dateFormatter.applyPattern("dd-MM-yyyy");
-
         tvDate.setText(dateFormatter.format(calendar.getTime()));
 
-        getLoaderManager().initLoader(alfa.ID, null, this);
-        getLoaderManager().initLoader(touch.ID, null, this);
-        getLoaderManager().initLoader(Cards.CARD_TYPE_ALFAGIFT, null, this);
+        getLoaderManager().restartLoader(Cards.CARD_TYPE_TOUCH, null, this);
+        getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFA, null, this);
+        getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFAGIFT, null, this);
     }
 
     public void updateDate(View v) {
         int changeDay = -1;
         if (v.getId() == R.id.button_IncreaseDate) {
+            dayIndex--;
             changeDay = 1;
             if ((calendar.get(Calendar.DAY_OF_YEAR) + 1) == (Calendar.getInstance().get(Calendar.DAY_OF_YEAR))) {
                 buttonIncrease.setEnabled(false);
             }
         } else {
+            dayIndex++;
             buttonIncrease.setEnabled(true);
+            buttonDecrease.setEnabled(false);
         }
 
         calendar.add(Calendar.DAY_OF_YEAR, changeDay);
         nextCalendar.add(Calendar.DAY_OF_YEAR, changeDay);
         tvDate.setText(dateFormatter.format(calendar.getTime()));
 
-        alfa.Clear();
-        touch.Clear();
-
-        getLoaderManager().restartLoader(alfa.ID, null, this);
-        getLoaderManager().restartLoader(touch.ID, null, this);
-        getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFAGIFT, null, this);
+        if (dayIndex + 1 > dollarsDataList.size()) {
+            getLoaderManager().restartLoader(Cards.CARD_TYPE_TOUCH, null, this);
+            getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFA, null, this);
+            getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFAGIFT, null, this);
+        } else {
+            showData(dayIndex,cummulative.isChecked());
+        }
     }
 
     static final String[] Message_SUMMARY_PROJECTION = new String[]{
@@ -103,9 +136,9 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         String sender;
-        if (id == alfa.ID) {
+        if (id == Cards.CARD_TYPE_ALFA) {
             sender = "'alfa'";
-        } else if (id == touch.ID) {
+        } else if (id == Cards.CARD_TYPE_TOUCH) {
             sender = "1199";
         } else {
             sender = "'Alfa'";
@@ -119,17 +152,28 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
                 Telephony.Sms.Inbox.DATE + " ASC");
     }
 
+    int loaderRounds = 3;
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (loader.getId() == touch.ID) {
+        if (loaderRounds == 3) {
+            touch.Clear();
+            alfa.Clear();
+        }
+
+        if (loader.getId() == Cards.CARD_TYPE_TOUCH) {
             touch.ProcessData(data);
-        } else if (loader.getId() == alfa.ID) {
+        } else if (loader.getId() == Cards.CARD_TYPE_ALFA) {
             alfa.ProcessData(data);
         } else if (loader.getId() == Cards.CARD_TYPE_ALFAGIFT) {
             alfa.GiftProcess(data);
         }
 
-        tvTotalMoney.setText(String.valueOf(touch.TotalMoney + alfa.TotalMoney));
+        if (--loaderRounds == 0) {
+            dollarsDataList.add(new DollarsData(touch, alfa));
+            showData(dayIndex, cummulative.isChecked());
+            loaderRounds = 3;
+        }
 
     }
 
@@ -137,6 +181,30 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     @Override
     public void onLoaderReset(Loader loader) {
 
+    }
+
+    void showData(int index, boolean isCumulative) {
+        DollarsData data;
+        if (isCumulative) {
+            data = new DollarsData();
+            for (int i = 0; i <= index; i++) {
+                data.addData(dollarsDataList.get(i));
+            }
+        } else {
+            data = dollarsDataList.get(index);
+        }
+
+        tv_touchReceivedDollars.setText(String.valueOf(data.touchReceivedDollars));
+        tv_touchSentDollars.setText(String.format(Locale.getDefault(), "%.2f", data.touchSentDollars));
+        tv_touchCardsCount.setText(String.valueOf(data.touchCardsCount));
+
+        tv_alfaReceivedDollars.setText(String.valueOf(data.alfaReceivedDollars));
+        tv_alfaSentDollars.setText(String.format(Locale.getDefault(), "%.2f", data.alfaSentDollars));
+        tv_alfaCardsCount.setText(String.valueOf(data.alfaCardsCount));
+
+        tvTotalMoney.setText(String.valueOf(data.touchTotalMoney + data.alfaTotalMoney));
+
+        buttonDecrease.setEnabled(true);
     }
 
     @Override
@@ -168,15 +236,8 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK)
-        {
-            lastCard.restorePrices();
-            lastCard.Clear();
-            getLoaderManager().restartLoader(lastCard.ID, null, this);
-            if (lastCard.getClass() == AlfaCards.class)
-            {
-                getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFAGIFT, null, this);
-            }
+        if (resultCode == RESULT_OK) {
+            initiateData();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

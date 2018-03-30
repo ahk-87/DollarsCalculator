@@ -30,9 +30,7 @@ abstract class Cards {
 
 
     MainActivity ownerActivity;
-    TextView tv_SentDollars, tv_ReceivedDollars, tv_CardsCount;
 
-    int ID;
     String Name;
     int[] dollarsPrice;
     int[] ayyamPrice;
@@ -47,7 +45,6 @@ abstract class Cards {
 
     Cards(Context c) {
         ownerActivity = (MainActivity) c;
-        prepareViews();
     }
 
     void Clear() {
@@ -56,12 +53,6 @@ abstract class Cards {
         cardsCount = 0;
         TotalMoney = 0;
         Ayyam.clear();
-    }
-
-    void showData() {
-        tv_ReceivedDollars.setText(String.valueOf(receivedDollars));
-        tv_SentDollars.setText(String.format(Locale.getDefault(), "%.2f", sentDollars));
-        tv_CardsCount.setText(String.valueOf(cardsCount));
     }
 
     void processAyam() {
@@ -96,8 +87,6 @@ abstract class Cards {
         dollarsPrice = stringToIntArray(ownerActivity.getSharedPreferences(Name + SHARED_PREF, Activity.MODE_PRIVATE).getString(SHARED_DOLLARS, "[ ]"));
     }
 
-    abstract void prepareViews();
-
     abstract void ProcessData(Cursor data);
 
     private int[] stringToIntArray(String s) {
@@ -123,7 +112,6 @@ class TouchCards extends Cards {
 
     TouchCards(Context c) {
         super(c);
-        ID = CARD_TYPE_TOUCH;
         Name = "touch";
         defaultDollarsPrices = "[0, 2500, 4000, 5000, 6500, 8000, 9000, 10000, 11000, 12000, 13000]";
         defaultAyyamPrices = "[16000, 18000, 19500, 21000, 22000, 23000, 24500, 26000, 27000, 28000, 29000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43000]";
@@ -131,12 +119,6 @@ class TouchCards extends Cards {
         preparePrices();
     }
 
-    @Override
-    void prepareViews() {
-        tv_SentDollars = (TextView) ownerActivity.findViewById(R.id.tv_TouchSent);
-        tv_ReceivedDollars = (TextView) ownerActivity.findViewById(R.id.tv_TouchReceived);
-        tv_CardsCount = (TextView) ownerActivity.findViewById(R.id.tv_TouchCards);
-    }
 
     @Override
     public void ProcessData(Cursor data) {
@@ -174,8 +156,6 @@ class TouchCards extends Cards {
 
             processAyam();
         }
-
-        showData();
     }
 }
 
@@ -183,19 +163,11 @@ class AlfaCards extends Cards {
 
     AlfaCards(Context c) {
         super(c);
-        ID = CARD_TYPE_ALFA;
         Name = "alfa";
         defaultDollarsPrices = "[0, 2500, 4500, 6000, 7500, 9000, 10000, 11500, 12500, 13500, 14500]";
         defaultAyyamPrices = "[14000, 16000, 17500, 19000, 20500, 22000, 23500, 25000, 26000, 27000, 28000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43000]";
         //defaultAyyamPrices = "[43000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28000, 27000, 26000, 25000, 23500, 22000, 20500, 19000, 17500, 16000, 14000]";
         preparePrices();
-    }
-
-    @Override
-    void prepareViews() {
-        tv_SentDollars = (TextView) ownerActivity.findViewById(R.id.tv_AlfaSent);
-        tv_ReceivedDollars = (TextView) ownerActivity.findViewById(R.id.tv_AlfaReceived);
-        tv_CardsCount = (TextView) ownerActivity.findViewById(R.id.tv_AlfaCards);
     }
 
     @Override
@@ -224,8 +196,6 @@ class AlfaCards extends Cards {
             processAyam();
 
         }
-
-        showData();
     }
 
     void GiftProcess(Cursor data) {
@@ -246,6 +216,57 @@ class AlfaCards extends Cards {
                 }
             }
         }
-        tv_SentDollars.setText(String.format(Locale.getDefault(), "%.2f", sentDollars));
     }
+}
+
+class DollarsData
+{
+    double touchSentDollars;
+    int touchReceivedDollars;
+    int touchCardsCount;
+    int touchTotalMoney;
+
+    double alfaSentDollars;
+    int alfaReceivedDollars;
+    int alfaCardsCount;
+    int alfaTotalMoney;
+
+    DollarsData()
+    {
+        touchSentDollars = 0;
+        touchReceivedDollars = 0;
+        touchCardsCount = 0;
+        touchTotalMoney = 0;
+
+        alfaSentDollars = 0;
+        alfaReceivedDollars = 0;
+        alfaCardsCount = 0;
+        alfaTotalMoney = 0;
+    }
+    DollarsData(TouchCards tc, AlfaCards ac)
+    {
+        touchSentDollars = tc.sentDollars;
+        touchReceivedDollars = tc.receivedDollars;
+        touchCardsCount = tc.cardsCount;
+        touchTotalMoney = tc.TotalMoney;
+
+        alfaSentDollars = ac.sentDollars;
+        alfaReceivedDollars = ac.receivedDollars;
+        alfaCardsCount = ac.cardsCount;
+        alfaTotalMoney = ac.TotalMoney;
+    }
+
+    void addData(DollarsData d)
+    {
+        touchSentDollars += d.touchSentDollars;
+        touchReceivedDollars += d.touchReceivedDollars;
+        touchCardsCount += d.touchCardsCount;
+        touchTotalMoney += d.touchTotalMoney;
+
+        alfaSentDollars += d.alfaSentDollars;
+        alfaReceivedDollars += d.alfaReceivedDollars;
+        alfaCardsCount += d.alfaCardsCount;
+        alfaTotalMoney += d.alfaTotalMoney;
+    }
+
 }
