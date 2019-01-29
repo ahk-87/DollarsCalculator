@@ -109,6 +109,7 @@ abstract class Cards {
 class TouchCards extends Cards {
 
     public int lost = 0;
+    public int discountOffer = 500;
 
     TouchCards(Context c) {
         super(c);
@@ -123,6 +124,7 @@ class TouchCards extends Cards {
     @Override
     public void ProcessData(Cursor data) {
         if (data.getCount() > 0) {
+            HashMap<String, Integer> DollarsSent = new HashMap<>();
             lost = 0;
             while (data.moveToNext()) {
                 String row = data.getString(1);
@@ -130,8 +132,17 @@ class TouchCards extends Cards {
                 sentDate.setTimeInMillis(data.getLong(2));
                 boolean afterTen = sentDate.get(Calendar.HOUR_OF_DAY) >= 22;
                 if (row.contains("from your")) {
-                    String dollarsSentString = row.split(" ")[2].substring(1);
+                    String[] words = row.split(" ");
+                    String dollarsSentString = words[2].substring(1);
+                    String numberSentString = words[12];
                     Integer dollarsSent = Integer.parseInt(dollarsSentString);
+
+                    int d = 0;
+                    if (DollarsSent.containsKey(numberSentString)) {
+                        d = DollarsSent.get(numberSentString);
+                    }
+                    DollarsSent.put(numberSentString, dollarsSent + d);
+
                     sentDollars += dollarsSent + 0.45;
                     TotalMoney += dollarsPrice[dollarsSent];
                     if (afterTen)
@@ -154,6 +165,13 @@ class TouchCards extends Cards {
                 }
             }
 
+            int discountedDollars = 0;
+            for (HashMap.Entry<String, Integer> entry : DollarsSent.entrySet()) {
+                if (entry.getValue() == 11 || entry.getValue() == 12 || entry.getValue() == 13)
+                    discountedDollars++;
+            }
+
+            TotalMoney -= discountOffer * discountedDollars;
             processAyam();
         }
     }
@@ -206,6 +224,8 @@ class AlfaCards extends Cards {
                     String[] words = row.split(" ");
                     if (words[7].length() < 9) continue;
                     String dollarsSentString = words[16].substring(0, 2);
+                    if (row.contains("broadband"))
+                        dollarsSentString = words[19].substring(0, 2);
                     int dollarsSent = Integer.parseInt(dollarsSentString);
                     sentDollars += dollarsSent;
                     while (dollarsSent > 10) {
@@ -219,8 +239,7 @@ class AlfaCards extends Cards {
     }
 }
 
-class DollarsData
-{
+class DollarsData {
     double touchSentDollars;
     int touchReceivedDollars;
     int touchCardsCount;
@@ -231,8 +250,7 @@ class DollarsData
     int alfaCardsCount;
     int alfaTotalMoney;
 
-    DollarsData()
-    {
+    DollarsData() {
         touchSentDollars = 0;
         touchReceivedDollars = 0;
         touchCardsCount = 0;
@@ -243,8 +261,8 @@ class DollarsData
         alfaCardsCount = 0;
         alfaTotalMoney = 0;
     }
-    DollarsData(TouchCards tc, AlfaCards ac)
-    {
+
+    DollarsData(TouchCards tc, AlfaCards ac) {
         touchSentDollars = tc.sentDollars;
         touchReceivedDollars = tc.receivedDollars;
         touchCardsCount = tc.cardsCount;
@@ -256,8 +274,7 @@ class DollarsData
         alfaTotalMoney = ac.TotalMoney;
     }
 
-    void addData(DollarsData d)
-    {
+    void addData(DollarsData d) {
         touchSentDollars += d.touchSentDollars;
         touchReceivedDollars += d.touchReceivedDollars;
         touchCardsCount += d.touchCardsCount;
