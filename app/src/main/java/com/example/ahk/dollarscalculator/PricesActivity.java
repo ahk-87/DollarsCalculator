@@ -38,11 +38,14 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
     int[] ayyamPrices;
     int[] dollarsPrices;
 
+    int offer;
+
     String cardType;
 
     Button button_add, button_substract;
     MenuItem menuItemSave;
 
+    TextView tv_offer;
 
     class SelectedItem {
         int adapterType;
@@ -60,12 +63,21 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
 
         button_add = (Button) findViewById(R.id.button_add);
         button_substract = (Button) findViewById(R.id.button_substract);
+        tv_offer = findViewById(R.id.tv_offer);
 
         cardType = getIntent().getStringExtra(MainActivity.EXTRA_CARD_TYPE);
         ayyamPrices = getIntent().getIntArrayExtra(MainActivity.EXTRA_AYYAM_ARRAY);
         dollarsPrices = getIntent().getIntArrayExtra(MainActivity.EXTRA_DOLLARS_ARRAY);
+        offer = getIntent().getIntExtra(MainActivity.EXTRA_OFFER, -1);
 
-        TextView textViewHeader = (TextView) findViewById(R.id.tv_MainHeader);
+        if (offer == -1)
+            tv_offer.setText("");
+        else if (offer == 0)
+            tv_offer.setText("no offer");
+        else
+            tv_offer.setText("offer");
+
+            TextView textViewHeader = (TextView) findViewById(R.id.tv_MainHeader);
         if (cardType.equals("alfa")) {
             textViewHeader.setText("ALFA");
             textViewHeader.setTextColor(0xFFFF0000);

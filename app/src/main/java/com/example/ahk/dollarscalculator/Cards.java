@@ -6,11 +6,14 @@ import android.database.Cursor;
 import android.text.format.DateUtils;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
 
 /**
  * Created by AHK on 23-Nov-17.
@@ -38,6 +41,7 @@ abstract class Cards {
     int receivedDollars = 0;
     int cardsCount = 0;
     Integer TotalMoney = 0;
+    int extraMonths = 0;
 
     String defaultDollarsPrices, defaultAyyamPrices;
 
@@ -53,11 +57,18 @@ abstract class Cards {
         cardsCount = 0;
         TotalMoney = 0;
         Ayyam.clear();
+        extraMonths = 0;
     }
 
     void processAyam() {
         for (HashMap.Entry<String, Integer> entry : Ayyam.entrySet()) {
             int dollars = entry.getValue();
+            if (dollars > 60)
+                extraMonths += 3;
+            else if (dollars > 40)
+                extraMonths += 2;
+            else if (dollars > 20)
+                extraMonths++;
             while (dollars > 20) {
                 cardsCount++;
                 dollars -= 20;
@@ -109,7 +120,7 @@ abstract class Cards {
 class TouchCards extends Cards {
 
     public int lost = 0;
-    public int discountOffer = 500;
+    public int discountOffer = 0;
 
     TouchCards(Context c) {
         super(c);
@@ -167,12 +178,17 @@ class TouchCards extends Cards {
 
             int discountedDollars = 0;
             for (HashMap.Entry<String, Integer> entry : DollarsSent.entrySet()) {
-                if (entry.getValue() == 11 || entry.getValue() == 12 || entry.getValue() == 13)
+                int sent = entry.getValue();
+                if (sent == 11 || sent == 12 || sent == 13 || sent == 15)
                     discountedDollars++;
+                else if (sent >= 20) {
+                    discountedDollars += sent / 10;
+                }
             }
 
             TotalMoney -= discountOffer * discountedDollars;
             processAyam();
+            //TotalMoney -= extraMonths*1000;
         }
     }
 }
@@ -191,13 +207,36 @@ class AlfaCards extends Cards {
     @Override
     public void ProcessData(Cursor data) {
         if (data.getCount() > 0) {
+            ArrayList<String> numbers = new ArrayList<String>();
+            Ayyam.clear();
             while (data.moveToNext()) {
                 String row = data.getString(1);
-                if (row.contains("from your")) {
+                if (row.contains("you have offered")) {
+                    String[] words = row.split(" ");
+                    String number = words[7];
+                    if (number.length() <= 8) {
+                        number = "961" + words[7];
+                    }
+                    if (numbers.contains(number)) continue;
+                    numbers.add(number);
+                    String dollarsSentString = words[16].substring(0, 2);
+                    if (row.contains("broadband"))
+                        dollarsSentString = words[19].substring(0, 2);
+                    if (row.contains("Weekly") || row.contains("MB Data Booster"))
+                        dollarsSentString = words[17].substring(0, 1);
+                    int dollarsSent = Integer.parseInt(dollarsSentString);
+                    sentDollars += dollarsSent;
+                    while (dollarsSent > 10) {
+                        TotalMoney += dollarsPrice[10];
+                        dollarsSent -= 10;
+                    }
+                    TotalMoney += dollarsPrice[dollarsSent];
+                } else if (row.contains("from your")) {
                     String dollarsSentString = row.split(" ")[1].substring(11);
                     Integer dollarsSent = Integer.parseInt(dollarsSentString);
                     sentDollars += dollarsSent + 0.4;
                     TotalMoney += dollarsPrice[dollarsSent];
+
                 } else if (row.contains("to your")) {
                     String[] words = row.split(" ");
                     String dollarsReceivedString = words[1].substring(11);
@@ -215,28 +254,6 @@ class AlfaCards extends Cards {
 
         }
     }
-
-    void GiftProcess(Cursor data) {
-        if (data.getCount() > 0) {
-            while (data.moveToNext()) {
-                String row = data.getString(1);
-                if (row.contains("you have offered")) {
-                    String[] words = row.split(" ");
-                    if (words[7].length() < 9) continue;
-                    String dollarsSentString = words[16].substring(0, 2);
-                    if (row.contains("broadband"))
-                        dollarsSentString = words[19].substring(0, 2);
-                    int dollarsSent = Integer.parseInt(dollarsSentString);
-                    sentDollars += dollarsSent;
-                    while (dollarsSent > 10) {
-                        TotalMoney += dollarsPrice[10];
-                        dollarsSent -= 10;
-                    }
-                    TotalMoney += dollarsPrice[dollarsSent];
-                }
-            }
-        }
-    }
 }
 
 class DollarsData {
@@ -244,17 +261,20 @@ class DollarsData {
     int touchReceivedDollars;
     int touchCardsCount;
     int touchTotalMoney;
+    int touchExtraMonths;
 
     double alfaSentDollars;
     int alfaReceivedDollars;
     int alfaCardsCount;
     int alfaTotalMoney;
 
+
     DollarsData() {
         touchSentDollars = 0;
         touchReceivedDollars = 0;
         touchCardsCount = 0;
         touchTotalMoney = 0;
+        touchExtraMonths = 0;
 
         alfaSentDollars = 0;
         alfaReceivedDollars = 0;
@@ -267,6 +287,7 @@ class DollarsData {
         touchReceivedDollars = tc.receivedDollars;
         touchCardsCount = tc.cardsCount;
         touchTotalMoney = tc.TotalMoney;
+        touchExtraMonths = tc.extraMonths;
 
         alfaSentDollars = ac.sentDollars;
         alfaReceivedDollars = ac.receivedDollars;
@@ -279,6 +300,7 @@ class DollarsData {
         touchReceivedDollars += d.touchReceivedDollars;
         touchCardsCount += d.touchCardsCount;
         touchTotalMoney += d.touchTotalMoney;
+        touchExtraMonths += d.touchExtraMonths;
 
         alfaSentDollars += d.alfaSentDollars;
         alfaReceivedDollars += d.alfaReceivedDollars;

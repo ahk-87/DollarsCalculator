@@ -38,6 +38,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     static final String EXTRA_CARD_TYPE = "cardType";
     static final String EXTRA_AYYAM_ARRAY = "ayyamArray";
     static final String EXTRA_DOLLARS_ARRAY = "dollarsArray";
+    static final String EXTRA_OFFER = "touchOffer";
     static final int REQUEST_ACTIVITY_CARDS = 200;
     private static final String TAG = "DollarsActivity";
 
@@ -56,7 +57,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
     CheckBox cummulative;
     TextView tvDate, tvTotalMoney;
-    TextView tv_touchSentDollars, tv_touchReceivedDollars, tv_touchCardsCount;
+    TextView tv_touchSentDollars, tv_touchReceivedDollars, tv_touchCardsCount, tv_extraMonths;
     TextView tv_alfaSentDollars, tv_alfaReceivedDollars, tv_alfaCardsCount;
 
     CalendarView datePicker;
@@ -76,6 +77,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         tv_touchSentDollars = findViewById(R.id.tv_TouchSent);
         tv_touchReceivedDollars = findViewById(R.id.tv_TouchReceived);
         tv_touchCardsCount = findViewById(R.id.tv_TouchCards);
+        tv_extraMonths = findViewById(R.id.tv_extraMonths);
 
         tv_alfaSentDollars = findViewById(R.id.tv_AlfaSent);
         tv_alfaReceivedDollars = findViewById(R.id.tv_AlfaReceived);
@@ -329,7 +331,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         } else if (loader.getId() == Cards.CARD_TYPE_ALFA) {
             alfa.ProcessData(data);
         } else if (loader.getId() == Cards.CARD_TYPE_ALFAGIFT) {
-            alfa.GiftProcess(data);
+            alfa.ProcessData(data);
         }
 
         if (--loaderRounds == 0) {
@@ -373,6 +375,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         tv_touchReceivedDollars.setText(String.valueOf(data.touchReceivedDollars));
         tv_touchSentDollars.setText(String.format(Locale.getDefault(), "%.2f", data.touchSentDollars));
         tv_touchCardsCount.setText(String.valueOf(data.touchCardsCount));
+        tv_extraMonths.setText(String.valueOf(data.touchExtraMonths));
 
         tv_alfaReceivedDollars.setText(String.valueOf(data.alfaReceivedDollars));
         tv_alfaSentDollars.setText(String.format(Locale.getDefault(), "%.2f", data.alfaSentDollars));
@@ -400,10 +403,14 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
             }
 
             Intent i = new Intent(this, PricesActivity.class);
-
+            int offer = -1;
             i.putExtra(EXTRA_CARD_TYPE, lastCard.Name);
             i.putExtra(EXTRA_AYYAM_ARRAY, lastCard.ayyamPrice);
             i.putExtra(EXTRA_DOLLARS_ARRAY, lastCard.dollarsPrice);
+            if (lastCard.getClass() == TouchCards.class) {
+                offer = ((TouchCards) lastCard).discountOffer;
+            }
+            i.putExtra(EXTRA_OFFER, offer);
             startActivityForResult(i, REQUEST_ACTIVITY_CARDS);
             return true;
 
