@@ -77,7 +77,7 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
         else
             tv_offer.setText("offer");
 
-            TextView textViewHeader = (TextView) findViewById(R.id.tv_MainHeader);
+        TextView textViewHeader = (TextView) findViewById(R.id.tv_MainHeader);
         if (cardType.equals("alfa")) {
             textViewHeader.setText("ALFA");
             textViewHeader.setTextColor(0xFFFF0000);
@@ -121,7 +121,7 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
             ayyamPrices[i + 10] = ayyamPrices[i] + dollarsPrices[10];
         }
         edit.putString(Cards.SHARED_AYYAM, Arrays.toString(ayyamPrices));
-        edit.commit();
+        edit.apply();
         setResult(RESULT_OK);
         finish();
         return super.onOptionsItemSelected(item);
@@ -229,9 +229,9 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
             int pos = position;
             if (adapterType == ADAPTER_TYPE_DOLLARS) {
                 pos++;
-                holder.textDescription.setText(String.valueOf(pos) + " $");
+                holder.textDescription.setText(pos + " $");
             } else if (adapterType == ADAPTER_TYPE_AYYAM) {
-                holder.textDescription.setText("(10+" + String.valueOf(10 - pos) + ")");
+                holder.textDescription.setText("(10+" + (10 - pos) + ")");
             }
             holder.textPrice.setText(String.valueOf(prices[pos]));
             return convertView;

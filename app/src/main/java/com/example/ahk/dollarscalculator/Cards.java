@@ -63,14 +63,22 @@ abstract class Cards {
     void processAyam() {
         for (HashMap.Entry<String, Integer> entry : Ayyam.entrySet()) {
             int dollars = entry.getValue();
-            if (dollars > 60)
-                extraMonths += 3;
-            else if (dollars > 40)
-                extraMonths += 2;
-            else if (dollars > 20)
-                extraMonths++;
+
+            if (dollars > 140) {
+                TotalMoney += 120000;
+                int extraDollar = 220 - dollars;
+                while (extraDollar > 10) {
+                    TotalMoney += dollarsPrice[10];
+                    extraDollar -= 10;
+                }
+                if (extraDollar > 0)
+                    TotalMoney += dollarsPrice[extraDollar];
+                return;
+            }
+
             while (dollars > 20) {
                 cardsCount++;
+                extraMonths++;
                 dollars -= 20;
                 TotalMoney += ayyamPrice[0];
             }
@@ -101,7 +109,7 @@ abstract class Cards {
     abstract void ProcessData(Cursor data);
 
     private int[] stringToIntArray(String s) {
-        String[] items = s.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\\s", "").split(",");
+        String[] items = s.replaceAll("\\[", "").replaceAll("]", "").replaceAll("\\s", "").split(",");
 
         int[] results = new int[items.length];
 
@@ -141,12 +149,12 @@ class TouchCards extends Cards {
                 String row = data.getString(1);
                 Calendar sentDate = new GregorianCalendar();
                 sentDate.setTimeInMillis(data.getLong(2));
+                String[] words = row.split(" ");
                 boolean afterTen = sentDate.get(Calendar.HOUR_OF_DAY) >= 22;
                 if (row.contains("from your")) {
-                    String[] words = row.split(" ");
                     String dollarsSentString = words[2].substring(1);
                     String numberSentString = words[12];
-                    Integer dollarsSent = Integer.parseInt(dollarsSentString);
+                    int dollarsSent = Integer.parseInt(dollarsSentString);
 
                     int d = 0;
                     if (DollarsSent.containsKey(numberSentString)) {
@@ -159,7 +167,6 @@ class TouchCards extends Cards {
                     if (afterTen)
                         sentDollars -= 0.01;
                 } else if (row.contains("to your")) {
-                    String[] words = row.split(" ");
                     String dollarsReceivedString = words[2].substring(1);
                     int dollarsReceived = Integer.parseInt(dollarsReceivedString);
                     int d = 0;
@@ -207,12 +214,12 @@ class AlfaCards extends Cards {
     @Override
     public void ProcessData(Cursor data) {
         if (data.getCount() > 0) {
-            ArrayList<String> numbers = new ArrayList<String>();
+            ArrayList<String> numbers = new ArrayList<>();
             Ayyam.clear();
             while (data.moveToNext()) {
                 String row = data.getString(1);
+                String[] words = row.split(" ");
                 if (row.contains("you have offered")) {
-                    String[] words = row.split(" ");
                     String number = words[7];
                     if (number.length() <= 8) {
                         number = "961" + words[7];
@@ -232,13 +239,17 @@ class AlfaCards extends Cards {
                     }
                     TotalMoney += dollarsPrice[dollarsSent];
                 } else if (row.contains("from your")) {
-                    String dollarsSentString = row.split(" ")[1].substring(11);
-                    Integer dollarsSent = Integer.parseInt(dollarsSentString);
+                    String dollarsSentString;
+                    if (row.contains("USD")) {
+                        dollarsSentString = row.split(" ")[2].replaceAll("USD","");
+                    } else {
+                        dollarsSentString = row.split(" ")[1].substring(11);
+                    }
+                    int dollarsSent = Integer.parseInt(dollarsSentString);
                     sentDollars += dollarsSent + 0.4;
                     TotalMoney += dollarsPrice[dollarsSent];
 
                 } else if (row.contains("to your")) {
-                    String[] words = row.split(" ");
                     String dollarsReceivedString = words[1].substring(11);
                     int dollarsReceived = Integer.parseInt(dollarsReceivedString);
                     int d = 0;
