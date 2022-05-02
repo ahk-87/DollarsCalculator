@@ -23,6 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.text.DateFormat;
@@ -64,6 +66,8 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     FrameLayout layout_DatePicker;
     TextView tv_dateTitle, tv_fromDate, tv_toDate;
 
+    GregorianCalendar selectedDate;
+
     int dayIndex = 0;
 
     @Override
@@ -89,7 +93,16 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         tv_fromDate = findViewById(R.id.tv_fromDate);
         tv_toDate = findViewById(R.id.tv_toDate);
 
+        selectedDate = new GregorianCalendar();
+        selectedDate.setTimeInMillis(Calendar.getInstance().getTimeInMillis());
+
         datePicker = findViewById(R.id.datePicker);
+        datePicker.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                selectedDate.set(year,month,dayOfMonth);
+            }
+        });
         layout_DatePicker = findViewById(R.id.layout_DatePicker);
 
         buttonDecrease = findViewById(R.id.button_DecreaseDate);
@@ -102,6 +115,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
                                               }
 
         );
+
         buttonIncrease = (ImageButton) findViewById(R.id.button_IncreaseDate);
         buttonIncrease.setOnLongClickListener(new View.OnLongClickListener() {
                                                   @Override
@@ -169,8 +183,8 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
             SimpleDateFormat f1 = (SimpleDateFormat) DateFormat.getDateTimeInstance();
             f1.applyPattern("yyyy-MM-dd HH:mm:ss SSS");
-            Log.d(TAG, "selectedDate: " + f1.format(calendar.getTime()));
-            Log.d(TAG, "selectedDate: " + f1.format(nextCalendar.getTime()));
+            //Log.d(TAG, "selectedDate: " + f1.format(calendar.getTime()));
+            //Log.d(TAG, "selectedDate: " + f1.format(nextCalendar.getTime()));
 
             if (dayIndex + 1 > dollarsDataList.size()) {
                 getLoaderManager().restartLoader(Cards.CARD_TYPE_TOUCH, null, this);
@@ -190,10 +204,10 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
             if (fromDate != null)
                 datePicker.setMinDate(fromDate.getTimeInMillis());
             else
-                datePicker.setMinDate(Calendar.getInstance().getTimeInMillis() - DateUtils.YEAR_IN_MILLIS);
+                datePicker.setMinDate(Calendar.getInstance().getTimeInMillis() - 31449600001L);
         } else {
             tv_dateTitle.setText("From Date");
-            datePicker.setMinDate(Calendar.getInstance().getTimeInMillis() - DateUtils.YEAR_IN_MILLIS);
+            datePicker.setMinDate(Calendar.getInstance().getTimeInMillis() - 31449600001L);
             if (toDate != null)
                 datePicker.setMaxDate(toDate.getTimeInMillis() - 1000);
             else
@@ -218,13 +232,11 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
             // Invoke the OK button method
             SimpleDateFormat f1 = (SimpleDateFormat) DateFormat.getDateTimeInstance();
             f1.applyPattern("yyyy-MM-dd HH:mm:ss SSS");
-            GregorianCalendar selectedDate = new GregorianCalendar();
-            selectedDate.setTime(new Date(datePicker.getDate()));
             selectedDate.set(Calendar.HOUR_OF_DAY, 23);
             selectedDate.set(Calendar.MINUTE, 59);
             selectedDate.set(Calendar.SECOND, 59);
             selectedDate.set(Calendar.MILLISECOND, 999);
-            Log.d(TAG, "selectedDate: " + f1.format(selectedDate.getTime()));
+            //Log.d(TAG, "selectedDate: " + f1.format(selectedDate.getTime()));
 
             if (datePicker.getTag().equals(buttonDecrease)) {
                 // Handle "from" date action
@@ -250,8 +262,8 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
                 toDate.add(Calendar.SECOND, 1);
             }
 
-            Log.d(TAG, "fromDate: " + f1.format(fromDate.getTime()));
-            Log.d(TAG, "toDate: " + f1.format(toDate.getTime()));
+            //Log.d(TAG, "fromDate: " + f1.format(fromDate.getTime()));
+            //Log.d(TAG, "toDate: " + f1.format(toDate.getTime()));
             GregorianCalendar toDateText = ((GregorianCalendar) toDate.clone());
             toDateText.add(Calendar.SECOND, -1);
             tv_fromDate.setText(dateFormatter.format(fromDate.getTime()));

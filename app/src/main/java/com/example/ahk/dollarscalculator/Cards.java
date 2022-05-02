@@ -240,10 +240,10 @@ class AlfaCards extends Cards {
                     TotalMoney += dollarsPrice[dollarsSent];
                 } else if (row.contains("from your")) {
                     String dollarsSentString;
-                    if (row.contains("USD")) {
-                        dollarsSentString = row.split(" ")[2].replaceAll("USD","");
-                    } else {
+                    if (row.contains("dollar")) {
                         dollarsSentString = row.split(" ")[1].substring(11);
+                    } else {
+                        dollarsSentString = row.split(" ")[2].replaceAll("USD","");
                     }
                     int dollarsSent = Integer.parseInt(dollarsSentString);
                     sentDollars += dollarsSent + 0.4;
