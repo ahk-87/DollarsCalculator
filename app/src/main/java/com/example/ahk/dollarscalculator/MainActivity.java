@@ -61,6 +61,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     TextView tvDate, tvTotalMoney;
     TextView tv_touchSentDollars, tv_touchReceivedDollars, tv_touchCardsCount, tv_extraMonths;
     TextView tv_alfaSentDollars, tv_alfaReceivedDollars, tv_alfaCardsCount;
+    TextView tv_touchYear,tv_alfaYear;
 
     CalendarView datePicker;
     FrameLayout layout_DatePicker;
@@ -81,11 +82,13 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         tv_touchSentDollars = findViewById(R.id.tv_TouchSent);
         tv_touchReceivedDollars = findViewById(R.id.tv_TouchReceived);
         tv_touchCardsCount = findViewById(R.id.tv_TouchCards);
+        tv_touchYear = findViewById(R.id.tv_TouchYear);
         tv_extraMonths = findViewById(R.id.tv_extraMonths);
 
         tv_alfaSentDollars = findViewById(R.id.tv_AlfaSent);
         tv_alfaReceivedDollars = findViewById(R.id.tv_AlfaReceived);
         tv_alfaCardsCount = findViewById(R.id.tv_AlfaCards);
+        tv_alfaYear = findViewById(R.id.tv_AlfaYear);
 
         tvDate = findViewById(R.id.row_textDescription);
         tvTotalMoney = findViewById(R.id.tv_TotalMoney);
@@ -367,7 +370,6 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
     }
 
-
     @Override
     public void onLoaderReset(Loader loader) {
 
@@ -387,11 +389,13 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         tv_touchReceivedDollars.setText(String.valueOf(data.touchReceivedDollars));
         tv_touchSentDollars.setText(String.format(Locale.getDefault(), "%.2f", data.touchSentDollars));
         tv_touchCardsCount.setText(String.valueOf(data.touchCardsCount));
+        tv_touchYear.setText(String.valueOf(data.touchYear));
         tv_extraMonths.setText(String.valueOf(data.touchExtraMonths));
 
         tv_alfaReceivedDollars.setText(String.valueOf(data.alfaReceivedDollars));
         tv_alfaSentDollars.setText(String.format(Locale.getDefault(), "%.2f", data.alfaSentDollars));
         tv_alfaCardsCount.setText(String.valueOf(data.alfaCardsCount));
+        tv_alfaYear.setText(String.valueOf(data.alfaYear));
 
         tvTotalMoney.setText(String.valueOf(data.touchTotalMoney + data.alfaTotalMoney));
 

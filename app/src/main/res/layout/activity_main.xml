@@ -192,6 +192,22 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_TouchReceived" />
 
     <TextView
+        android:id="@+id/tv_TouchYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:text="0"
+        android:textSize="18sp"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="@+id/textView5"
+        app:layout_constraintStart_toStartOf="@+id/textView5"
+        app:layout_constraintTop_toBottomOf="@+id/tv_TouchCards" />
+
+    <TextView
         android:id="@+id/tv_AlfaCards"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -204,6 +220,20 @@
         app:layout_constraintLeft_toLeftOf="@+id/textView4"
         app:layout_constraintRight_toRightOf="@+id/textView4"
         app:layout_constraintTop_toBottomOf="@+id/tv_AlfaReceived" />
+
+    <TextView
+        android:id="@+id/tv_AlfaYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:text="0"
+        android:textSize="18sp"
+        android:textStyle="italic"
+        app:layout_constraintLeft_toLeftOf="@+id/textView4"
+        app:layout_constraintRight_toRightOf="@+id/textView4"
+        app:layout_constraintTop_toBottomOf="@+id/tv_AlfaCards" />
 
     <CheckBox
         android:id="@+id/cb_cumulative"
@@ -243,25 +273,34 @@
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:text="Extra Months"
         app:layout_constraintBottom_toBottomOf="@+id/tv_extraMonths"
         app:layout_constraintStart_toStartOf="@+id/textView12"
         app:layout_constraintTop_toTopOf="@+id/tv_extraMonths" />
 
     <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Year"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_TouchYear"
+        app:layout_constraintStart_toStartOf="@+id/textView6"
+        app:layout_constraintTop_toTopOf="@+id/tv_TouchYear" />
+
+    <TextView
         android:id="@+id/tv_extraMonths"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:text="0"
         android:textColor="@color/colorAccent"
         app:layout_constraintEnd_toEndOf="@+id/textView5"
-        app:layout_constraintHorizontal_bias="0.478"
+        app:layout_constraintHorizontal_bias="0.47"
         app:layout_constraintStart_toStartOf="@+id/textView5"
-        app:layout_constraintTop_toBottomOf="@+id/tv_TouchCards" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_TouchYear" />
 
     <FrameLayout
         android:id="@+id/layout_DatePicker"

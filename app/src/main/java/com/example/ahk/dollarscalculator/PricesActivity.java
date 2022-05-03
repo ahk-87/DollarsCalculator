@@ -165,20 +165,21 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
 
     public void changerPrice(View v) {
         int change = 500;
+        int offset = 0;
         int[] prices = dollarsPrices;
 
         if (v.getId() == R.id.button_substract)
             change = -500;
 
-        if (lastSelected.adapterType == ADAPTER_TYPE_AYYAM)
+        if (lastSelected.adapterType == ADAPTER_TYPE_AYYAM) {
             prices = ayyamPrices;
+            if (lastSelected.position == 11) offset = 9;
+        }
 
-        if (change == 500) {
-            prices[lastSelected.position] += change;
-        } else if (prices[lastSelected.position] > 500)
-            prices[lastSelected.position] += change;
+        if (prices[lastSelected.position + offset] > 500)
+            prices[lastSelected.position + offset] += change;
 
-        lastSelected.viewPice.setText(String.valueOf(prices[lastSelected.position]));
+        lastSelected.viewPice.setText(String.valueOf(prices[lastSelected.position + offset]));
 
         menuItemSave.setVisible(true);
     }
@@ -228,19 +229,23 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
             }
             int pos = position;
             if (adapterType == ADAPTER_TYPE_DOLLARS) {
-                pos++;
-                holder.textDescription.setText(pos + " $");
+                holder.textDescription.setText(++pos + " $");
             } else if (adapterType == ADAPTER_TYPE_AYYAM) {
-                holder.textDescription.setText("(10+" + (10 - pos) + ")");
+                if (pos == 11) {
+                    holder.textDescription.setText("1 year");
+                    pos = 20;
+                } else
+                    holder.textDescription.setText("(10+" + (10 - pos) + ")");
             }
             holder.textPrice.setText(String.valueOf(prices[pos]));
+
             return convertView;
         }
 
         @Override
         public int getCount() {
             if (adapterType == ADAPTER_TYPE_AYYAM)
-                return 11;
+                return 12;
             else
                 return 10;
         }

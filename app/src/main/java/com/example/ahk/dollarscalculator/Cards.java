@@ -42,6 +42,7 @@ abstract class Cards {
     int cardsCount = 0;
     Integer TotalMoney = 0;
     int extraMonths = 0;
+    int year = 0;
 
     String defaultDollarsPrices, defaultAyyamPrices;
 
@@ -58,6 +59,7 @@ abstract class Cards {
         TotalMoney = 0;
         Ayyam.clear();
         extraMonths = 0;
+        year = 0;
     }
 
     void processAyam() {
@@ -65,7 +67,8 @@ abstract class Cards {
             int dollars = entry.getValue();
 
             if (dollars > 140) {
-                TotalMoney += 120000;
+                year++;
+                TotalMoney += ayyamPrice[20];
                 int extraDollar = 220 - dollars;
                 while (extraDollar > 10) {
                     TotalMoney += dollarsPrice[10];
@@ -73,7 +76,7 @@ abstract class Cards {
                 }
                 if (extraDollar > 0)
                     TotalMoney += dollarsPrice[extraDollar];
-                return;
+                continue;
             }
 
             while (dollars > 20) {
@@ -134,7 +137,7 @@ class TouchCards extends Cards {
         super(c);
         Name = "touch";
         defaultDollarsPrices = "[0, 2500, 4000, 5000, 6500, 8000, 9000, 10000, 11000, 12000, 13000]";
-        defaultAyyamPrices = "[16000, 18000, 19500, 21000, 22000, 23000, 24500, 26000, 27000, 28000, 29000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43000]";
+        defaultAyyamPrices = "[16000, 18000, 19500, 21000, 22000, 23000, 24500, 26000, 27000, 28000, 29000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 120000]";
         //defaultAyyamPrices = "[43000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29000, 28000, 27000, 26000, 24500, 23000, 22000, 21000, 19500, 18000, 16000]";
         preparePrices();
     }
@@ -206,7 +209,7 @@ class AlfaCards extends Cards {
         super(c);
         Name = "alfa";
         defaultDollarsPrices = "[0, 2500, 4500, 6000, 7500, 9000, 10000, 11500, 12500, 13500, 14500]";
-        defaultAyyamPrices = "[14000, 16000, 17500, 19000, 20500, 22000, 23500, 25000, 26000, 27000, 28000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43000]";
+        defaultAyyamPrices = "[14000, 16000, 17500, 19000, 20500, 22000, 23500, 25000, 26000, 27000, 28000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 120000]";
         //defaultAyyamPrices = "[43000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28000, 27000, 26000, 25000, 23500, 22000, 20500, 19000, 17500, 16000, 14000]";
         preparePrices();
     }
@@ -273,11 +276,13 @@ class DollarsData {
     int touchCardsCount;
     int touchTotalMoney;
     int touchExtraMonths;
+    int touchYear;
 
     double alfaSentDollars;
     int alfaReceivedDollars;
     int alfaCardsCount;
     int alfaTotalMoney;
+    int alfaYear;
 
 
     DollarsData() {
@@ -286,11 +291,13 @@ class DollarsData {
         touchCardsCount = 0;
         touchTotalMoney = 0;
         touchExtraMonths = 0;
+        touchYear = 0;
 
         alfaSentDollars = 0;
         alfaReceivedDollars = 0;
         alfaCardsCount = 0;
         alfaTotalMoney = 0;
+        alfaYear = 0;
     }
 
     DollarsData(TouchCards tc, AlfaCards ac) {
@@ -299,11 +306,13 @@ class DollarsData {
         touchCardsCount = tc.cardsCount;
         touchTotalMoney = tc.TotalMoney;
         touchExtraMonths = tc.extraMonths;
+        touchYear = tc.year;
 
         alfaSentDollars = ac.sentDollars;
         alfaReceivedDollars = ac.receivedDollars;
         alfaCardsCount = ac.cardsCount;
         alfaTotalMoney = ac.TotalMoney;
+        alfaYear = ac.year;
     }
 
     void addData(DollarsData d) {
@@ -312,11 +321,13 @@ class DollarsData {
         touchCardsCount += d.touchCardsCount;
         touchTotalMoney += d.touchTotalMoney;
         touchExtraMonths += d.touchExtraMonths;
+        touchYear += d.touchYear;
 
         alfaSentDollars += d.alfaSentDollars;
         alfaReceivedDollars += d.alfaReceivedDollars;
         alfaCardsCount += d.alfaCardsCount;
         alfaTotalMoney += d.alfaTotalMoney;
+        alfaYear += d.alfaYear;
     }
 
 }
