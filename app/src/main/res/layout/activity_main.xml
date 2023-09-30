@@ -57,10 +57,6 @@
         android:id="@+id/tv_TotalMoney"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginTop="0dp"
         android:text="0"
         android:textColor="@android:color/holo_green_dark"
         android:textSize="30sp"
@@ -169,14 +165,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="Cards Used"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_TouchCards"
+        android:text="Big Cards Used"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_TouchBigCards"
         app:layout_constraintLeft_toLeftOf="@+id/textView10"
-        app:layout_constraintTop_toTopOf="@+id/tv_TouchCards"
+        app:layout_constraintTop_toTopOf="@+id/tv_TouchBigCards"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/tv_TouchCards"
+        android:id="@+id/tv_TouchBigCards"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -205,10 +201,10 @@
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="@+id/textView5"
         app:layout_constraintStart_toStartOf="@+id/textView5"
-        app:layout_constraintTop_toBottomOf="@+id/tv_TouchCards" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_TouchBigCards" />
 
     <TextView
-        android:id="@+id/tv_AlfaCards"
+        android:id="@+id/tv_AlfaBigCards"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -233,7 +229,7 @@
         android:textStyle="italic"
         app:layout_constraintLeft_toLeftOf="@+id/textView4"
         app:layout_constraintRight_toRightOf="@+id/textView4"
-        app:layout_constraintTop_toBottomOf="@+id/tv_AlfaCards" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_AlfaBigCards" />
 
     <CheckBox
         android:id="@+id/cb_cumulative"
@@ -273,10 +269,10 @@
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Extra Months"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_extraMonths"
+        android:text="Small Cards"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_smallCardsCount"
         app:layout_constraintStart_toStartOf="@+id/textView12"
-        app:layout_constraintTop_toTopOf="@+id/tv_extraMonths" />
+        app:layout_constraintTop_toTopOf="@+id/tv_smallCardsCount" />
 
     <TextView
         android:id="@+id/textView7"
@@ -289,7 +285,7 @@
         app:layout_constraintTop_toTopOf="@+id/tv_TouchYear" />
 
     <TextView
-        android:id="@+id/tv_extraMonths"
+        android:id="@+id/tv_smallCardsCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"

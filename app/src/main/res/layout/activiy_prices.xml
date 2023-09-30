@@ -82,6 +82,15 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/button_substract10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:onClick="changerPrice"
+            android:text="- -" />
+
+        <Button
             android:id="@+id/button_substract"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -97,7 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="500"
+            android:text="@string/stepIncrease"
             android:textColor="@android:color/holo_green_dark"
             android:textSize="30sp" />
 
@@ -110,6 +119,16 @@
             android:onClick="changerPrice"
             android:text="+"
             android:textSize="30sp" />
+
+        <Button
+            android:id="@+id/button_add10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:onClick="changerPrice"
+            android:text="++" />
+
     </LinearLayout>
 
 </RelativeLayout>

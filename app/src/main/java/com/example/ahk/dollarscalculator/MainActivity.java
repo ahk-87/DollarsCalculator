@@ -5,18 +5,13 @@ import android.app.LoaderManager;
 import android.content.*;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
-import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -25,12 +20,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.common.GoogleApiAvailability;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -58,9 +50,9 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     ArrayList<DollarsData> dollarsDataList;
 
     CheckBox cummulative;
-    TextView tvDate, tvTotalMoney;
-    TextView tv_touchSentDollars, tv_touchReceivedDollars, tv_touchCardsCount, tv_extraMonths;
-    TextView tv_alfaSentDollars, tv_alfaReceivedDollars, tv_alfaCardsCount;
+    TextView tvDate, tvTotalMoney, tv_smallCardsCount;
+    TextView tv_touchSentDollars, tv_touchReceivedDollars, tv_touchBigCardsCount;
+    TextView tv_alfaSentDollars, tv_alfaReceivedDollars, tv_alfaBigCardsCount;
     TextView tv_touchYear,tv_alfaYear;
 
     CalendarView datePicker;
@@ -81,15 +73,15 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
         tv_touchSentDollars = findViewById(R.id.tv_TouchSent);
         tv_touchReceivedDollars = findViewById(R.id.tv_TouchReceived);
-        tv_touchCardsCount = findViewById(R.id.tv_TouchCards);
+        tv_touchBigCardsCount = findViewById(R.id.tv_TouchBigCards);
         tv_touchYear = findViewById(R.id.tv_TouchYear);
-        tv_extraMonths = findViewById(R.id.tv_extraMonths);
 
         tv_alfaSentDollars = findViewById(R.id.tv_AlfaSent);
         tv_alfaReceivedDollars = findViewById(R.id.tv_AlfaReceived);
-        tv_alfaCardsCount = findViewById(R.id.tv_AlfaCards);
+        tv_alfaBigCardsCount = findViewById(R.id.tv_AlfaBigCards);
         tv_alfaYear = findViewById(R.id.tv_AlfaYear);
 
+        tv_smallCardsCount = findViewById(R.id.tv_smallCardsCount);
         tvDate = findViewById(R.id.row_textDescription);
         tvTotalMoney = findViewById(R.id.tv_TotalMoney);
         tv_dateTitle = findViewById(R.id.tv_DatePickerTitle);
@@ -108,6 +100,14 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         });
         layout_DatePicker = findViewById(R.id.layout_DatePicker);
 
+        tvTotalMoney.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                initiateData();
+                return true;
+            }
+        });
+
         buttonDecrease = findViewById(R.id.button_DecreaseDate);
         buttonDecrease.setOnLongClickListener(new View.OnLongClickListener() {
                                                   @Override
@@ -119,7 +119,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
         );
 
-        buttonIncrease = (ImageButton) findViewById(R.id.button_IncreaseDate);
+        buttonIncrease = findViewById(R.id.button_IncreaseDate);
         buttonIncrease.setOnLongClickListener(new View.OnLongClickListener() {
                                                   @Override
                                                   public boolean onLongClick(View v) {
@@ -156,7 +156,6 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
         getLoaderManager().restartLoader(Cards.CARD_TYPE_TOUCH, null, this);
         getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFA, null, this);
-        getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFAGIFT, null, this);
     }
 
     int changeDay = 0;
@@ -192,7 +191,6 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
             if (dayIndex + 1 > dollarsDataList.size()) {
                 getLoaderManager().restartLoader(Cards.CARD_TYPE_TOUCH, null, this);
                 getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFA, null, this);
-                getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFAGIFT, null, this);
             } else {
                 showData(dayIndex, cummulative.isChecked(), null);
             }
@@ -277,7 +275,6 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
             getLoaderManager().restartLoader(Cards.CARD_TYPE_TOUCH, null, this);
             getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFA, null, this);
-            getLoaderManager().restartLoader(Cards.CARD_TYPE_ALFAGIFT, null, this);
 
         }
 
@@ -312,11 +309,12 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         String sender;
-        if (id == Cards.CARD_TYPE_ALFA) {
-            sender = "'alfa'";
-        } else if (id == Cards.CARD_TYPE_TOUCH) {
+        if (id == Cards.CARD_TYPE_TOUCH) {
             sender = "1199";
-        } else {
+
+        }
+        else
+        {
             sender = "'Alfa'";
         }
 
@@ -330,22 +328,17 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
                 Message_SUMMARY_PROJECTION, select, null,
                 Telephony.Sms.Inbox.DATE + " ASC");
     }
-
-    int loaderRounds = 3;
+    int loaderRounds = 2;
     boolean dateChanged = false;
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (loaderRounds == 3) {
-            touch.Clear();
-            alfa.Clear();
-        }
 
         if (loader.getId() == Cards.CARD_TYPE_TOUCH) {
+            touch.Clear();
             touch.ProcessData(data);
         } else if (loader.getId() == Cards.CARD_TYPE_ALFA) {
-            alfa.ProcessData(data);
-        } else if (loader.getId() == Cards.CARD_TYPE_ALFAGIFT) {
+            alfa.Clear();
             alfa.ProcessData(data);
         }
 
@@ -365,7 +358,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
                 }
                 showData(dayIndex, cummulative.isChecked(), null);
             }
-            loaderRounds = 3;
+            loaderRounds = 2;
         }
 
     }
@@ -388,13 +381,13 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
         tv_touchReceivedDollars.setText(String.valueOf(data.touchReceivedDollars));
         tv_touchSentDollars.setText(String.format(Locale.getDefault(), "%.2f", data.touchSentDollars));
-        tv_touchCardsCount.setText(String.valueOf(data.touchCardsCount));
+        tv_touchBigCardsCount.setText(String.valueOf(data.touchCardsBigCount));
         tv_touchYear.setText(String.valueOf(data.touchYear));
-        tv_extraMonths.setText(String.valueOf(data.touchExtraMonths));
+        tv_smallCardsCount.setText(String.valueOf(data.cardsSmallCount));
 
         tv_alfaReceivedDollars.setText(String.valueOf(data.alfaReceivedDollars));
         tv_alfaSentDollars.setText(String.format(Locale.getDefault(), "%.2f", data.alfaSentDollars));
-        tv_alfaCardsCount.setText(String.valueOf(data.alfaCardsCount));
+        tv_alfaBigCardsCount.setText(String.valueOf(data.alfaCardsBigCount));
         tv_alfaYear.setText(String.valueOf(data.alfaYear));
 
         tvTotalMoney.setText(String.valueOf(data.touchTotalMoney + data.alfaTotalMoney));
@@ -440,5 +433,16 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
             initiateData();
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //this.finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

@@ -39,10 +39,11 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
     int[] dollarsPrices;
 
     int offer;
+    static final int half_dollar_increment = 40000; //for ayam from card 4.5$
 
     String cardType;
 
-    Button button_add, button_substract;
+    Button button_add, button_substract, button_add10, button_substract10;
     MenuItem menuItemSave;
 
     TextView tv_offer;
@@ -61,14 +62,17 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
 
         setContentView(R.layout.activiy_prices);
 
-        button_add = (Button) findViewById(R.id.button_add);
-        button_substract = (Button) findViewById(R.id.button_substract);
+        button_add =  findViewById(R.id.button_add);
+        button_substract = findViewById(R.id.button_substract);
+        button_add10 =  findViewById(R.id.button_add10);
+        button_substract10 = findViewById(R.id.button_substract10);
         tv_offer = findViewById(R.id.tv_offer);
 
         cardType = getIntent().getStringExtra(MainActivity.EXTRA_CARD_TYPE);
         ayyamPrices = getIntent().getIntArrayExtra(MainActivity.EXTRA_AYYAM_ARRAY);
         dollarsPrices = getIntent().getIntArrayExtra(MainActivity.EXTRA_DOLLARS_ARRAY);
         offer = getIntent().getIntExtra(MainActivity.EXTRA_OFFER, -1);
+
 
         if (offer == -1)
             tv_offer.setText("");
@@ -77,7 +81,7 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
         else
             tv_offer.setText("offer");
 
-        TextView textViewHeader = (TextView) findViewById(R.id.tv_MainHeader);
+        TextView textViewHeader = findViewById(R.id.tv_MainHeader);
         if (cardType.equals("alfa")) {
             textViewHeader.setText("ALFA");
             textViewHeader.setTextColor(0xFFFF0000);
@@ -89,12 +93,12 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
         adapterAyyam = new PricesAdapter(this, ADAPTER_TYPE_AYYAM, ayyamPrices);
         adapterDollars = new PricesAdapter(this, ADAPTER_TYPE_DOLLARS, dollarsPrices);
 
-        listAyyam = (ListView) findViewById(R.id.list_ayyam);
+        listAyyam = findViewById(R.id.list_ayyam);
         listAyyam.setAdapter(adapterAyyam);
         listAyyam.setTag(ADAPTER_TYPE_AYYAM);
         listAyyam.setOnItemClickListener(this);
 
-        listDollars = (ListView) findViewById(R.id.list_dollars);
+        listDollars = findViewById(R.id.list_dollars);
         listDollars.setAdapter(adapterDollars);
         listDollars.setTag(ADAPTER_TYPE_DOLLARS);
         listDollars.setOnItemClickListener(this);
@@ -117,8 +121,10 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
         String d = Arrays.toString(dollarsPrices);
 
         edit.putString(Cards.SHARED_DOLLARS, d);
-        for (int i = 1; i < 10; i++) {
-            ayyamPrices[i + 10] = ayyamPrices[i] + dollarsPrices[10];
+        for (int i = 1; i < 6; i++) {
+            //ayyamPrices[i + 6] = ayyamPrices[6] + dollarsPrices[i] - 5000;
+            ayyamPrices[i + 6] = ayyamPrices[6] + (i * half_dollar_increment);
+
         }
         edit.putString(Cards.SHARED_AYYAM, Arrays.toString(ayyamPrices));
         edit.apply();
@@ -138,6 +144,8 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
 
         button_substract.setEnabled(true);
         button_add.setEnabled(true);
+        button_substract10.setEnabled(true);
+        button_add10.setEnabled(true);
 
         if (lastSelected.adapterType == 0) {
             ((ListView) parent).setSelector(android.R.color.holo_blue_light);
@@ -160,23 +168,30 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
             pos++;
 
         lastSelected.position = pos;
-        lastSelected.viewPice = (TextView) view.findViewById(R.id.row_textPrice);
+        lastSelected.viewPice = view.findViewById(R.id.row_textPrice);
     }
 
     public void changerPrice(View v) {
-        int change = 500;
+        int change = Integer.parseInt(getResources().getString(R.string.stepIncrease));
         int offset = 0;
         int[] prices = dollarsPrices;
 
         if (v.getId() == R.id.button_substract)
-            change = -500;
+            change *= -1;
+        else if (v.getId() == R.id.button_substract10)
+            change *= -10;
+        else if (v.getId() == R.id.button_add10)
+            change *= 10;
 
         if (lastSelected.adapterType == ADAPTER_TYPE_AYYAM) {
             prices = ayyamPrices;
-            if (lastSelected.position == 11) offset = 9;
+            if (lastSelected.position >= 7) {
+                offset = 6;
+                //if (cardType.equals("alfa")) offset++;
+            }
         }
 
-        if (prices[lastSelected.position + offset] > 500)
+        if (prices[lastSelected.position + offset] > change)
             prices[lastSelected.position + offset] += change;
 
         lastSelected.viewPice.setText(String.valueOf(prices[lastSelected.position + offset]));
@@ -220,8 +235,8 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
                 convertView = inflater.inflate(R.layout.row_price, null);
 
                 holder = new ViewHolder();
-                holder.textDescription = (TextView) convertView.findViewById(R.id.row_textDescription);
-                holder.textPrice = (TextView) convertView.findViewById(R.id.row_textPrice);
+                holder.textDescription = convertView.findViewById(R.id.row_textDescription);
+                holder.textPrice = convertView.findViewById(R.id.row_textPrice);
 
                 convertView.setTag(holder);
             } else {
@@ -229,13 +244,20 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
             }
             int pos = position;
             if (adapterType == ADAPTER_TYPE_DOLLARS) {
-                holder.textDescription.setText(++pos + " $");
+                double dolarText = ++pos / 2.0;
+                holder.textDescription.setText(String.format("%.1f", dolarText) + " $");
+
             } else if (adapterType == ADAPTER_TYPE_AYYAM) {
-                if (pos == 11) {
-                    holder.textDescription.setText("1 year");
-                    pos = 20;
-                } else
-                    holder.textDescription.setText("(10+" + (10 - pos) + ")");
+                if (pos == 7) {
+                    holder.textDescription.setText("3 months");
+                    pos = 13;
+                } else if (pos == 8) {
+                    holder.textDescription.setText("1 Year");
+                    pos = 14;
+                } else {
+                    double ayamText = pos / 2.0;
+                    holder.textDescription.setText("(3.0+" + (3 - ayamText) + ")");
+                }
             }
             holder.textPrice.setText(String.valueOf(prices[pos]));
 
@@ -245,9 +267,13 @@ public class PricesActivity extends Activity implements AdapterView.OnItemClickL
         @Override
         public int getCount() {
             if (adapterType == ADAPTER_TYPE_AYYAM)
+                return 9;
+            else
+                return 6;
+            /*    //old values
                 return 12;
             else
-                return 10;
+                return 10;*/
         }
 
         @Override
